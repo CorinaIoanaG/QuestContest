@@ -21,11 +21,11 @@ public class User {
     @GeneratedValue
     private Long id;
     @Column
-    private String userName;
+    private String name;
     @Column
-    private String password;
+    private String pass;
     @Column
-    private String userFullName;
+    private String fullName;
     @Column
     private String email;
     @Column
