@@ -1,4 +1,4 @@
-//package com.QuizContest.controller.dto;
-//
-//public record PatchUserRequest(String fullName, String town, String contact) {
-//}
+package com.QuestContest.controller.dto;
+
+public record PatchUserRequest(String name, String pass, String fullName, String email) {
+}

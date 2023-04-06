@@ -1,5 +1,6 @@
 package com.QuestContest.controller;
 
+import com.QuestContest.controller.dto.PatchUserRequest;
 import com.QuestContest.model.User;
 import com.QuestContest.service.User.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +25,10 @@ public class QuestContestController {
         return userService.getById(id);
     }
 
-//    @PatchMapping("{id}")
-//    public User patch(@PathVariable int id, @RequestBody PatchUserRequest request) {
-//        return imcService.patch(id, request.fullName(), request.town(), request.contact());
-//    }
+   @PatchMapping("{id}")
+    public User patch(@PathVariable Long id, @RequestBody PatchUserRequest request) {
+        return userService.patch(id, request.name(), request.pass(), request.fullName(), request.email());
+    }
 
     @DeleteMapping("{id}")
     public User deleteById(@PathVariable Long id) {

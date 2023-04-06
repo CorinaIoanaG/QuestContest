@@ -9,44 +9,45 @@ import java.util.List;
 @Service
 
 public class UserService {
-    private final UserRepository quizRepositoryRepository;
+    private final UserRepository userRepository;
 
     // Constructor
-    public UserService(UserRepository quizRepository, com.QuestContest.service.User.UserReader userReader) {
-        this.quizRepositoryRepository = quizRepository;
-        quizRepository.saveAll(userReader.getUsers());
+    public UserService(UserRepository userRepository, com.QuestContest.service.User.UserReader userReader) {
+        this.userRepository = userRepository;
+        userRepository.saveAll(userReader.getUsers());
     }
 
     // Returns all users.
     public List<User> getAll() {
-        return quizRepositoryRepository.findAll();
+        return userRepository.findAll();
     }
 
     // Returns a User with a specific id.
     public User getById(Long id) {
-        return quizRepositoryRepository.findById(id)
+        return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User missing ", id));
     }
 
-//    // Updates name, town and contact for a specific User.
-//    public User patch(int id, String name, String town, String contact) {
-//        User userToBeUpdated = getById(id);
-//        userToBeUpdated.setFullName(name);
-//        userToBeUpdated.setTown(town);
-//        userToBeUpdated.setContact(contact);
-//        return quizRepositoryRepository.save(userToBeUpdated);
-//    }
+    // Updates a specific User.
+    public User patch(Long id, String name, String pass, String fullName, String email) {
+        User userToBeUpdated = getById(id);
+        userToBeUpdated.setName(name);
+        userToBeUpdated.setPass(pass);
+        userToBeUpdated.setFullName(fullName);
+        userToBeUpdated.setEmail(email);
+        return userRepository.save(userToBeUpdated);
+    }
 
     // Deletes a specific User.
     public User deleteById(Long id) {
         User userToBeDeleted = getById(id);
-        quizRepositoryRepository.deleteById(id);
+        userRepository.deleteById(id);
         return userToBeDeleted;
     }
 
     // Adding a new User.
     public User add(User user) {
-        return quizRepositoryRepository.save(user);
+        return userRepository.save(user);
     }
 
 //    // Adding a new UserData to a specific User.

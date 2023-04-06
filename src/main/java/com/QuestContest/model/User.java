@@ -38,4 +38,11 @@ public class User {
     @Nullable
     @OneToMany(mappedBy = "userQuestAnswered", cascade = {CascadeType.DETACH}, fetch = FetchType.EAGER)
     private List<Quest> questsAnswered;
+
+    public User(String name, String pass, String fullName, String email) {
+        this.name = name;
+        this.pass = pass;
+        this.fullName = fullName;
+        this.email = email;
+    }
 }
