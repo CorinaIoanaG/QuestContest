@@ -1,6 +1,8 @@
-package com.QuestContest.service.User;
+package com.QuestContest.service;
 
+import com.QuestContest.controller.dto.PatchQuestRequest;
 import com.QuestContest.exception.ResourceNotFoundException;
+import com.QuestContest.model.Quest;
 import com.QuestContest.model.User;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +14,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     // Constructor
-    public UserService(UserRepository userRepository, com.QuestContest.service.User.UserReader userReader) {
+    public UserService(UserRepository userRepository, UserReader userReader) {
         this.userRepository = userRepository;
         userRepository.saveAll(userReader.getUsers());
     }
@@ -50,13 +52,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
-//    // Adding a new UserData to a specific User.
-//    public User addDataToUser(int id, PatchUserDataRequest patchUserDataRequest) {
-//        User user = getById(id);
-//        UserData userData = new UserData(patchUserDataRequest.date(), patchUserDataRequest.weight(), patchUserDataRequest.height());
-//        userData.setUser(user);
-//        user.getUserData().add(userData);
-//        return quizRepositoryRepository.save(user);
-//    }
+    // Adding a new Quest from a specific User.
+    public User addQuestfromUser(Long id, PatchQuestRequest patchQuestRequest) {
+        User user = getById(id);
+        Quest quest = new Quest(patchQuestRequest.badge(), patchQuestRequest.quest(), patchQuestRequest.answer());
+        quest.setUserQuest(user);
+        user.getQuests().add(quest);
+        return userRepository.save(user);
+    }
 
 }

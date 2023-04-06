@@ -1,8 +1,9 @@
 package com.QuestContest.controller;
 
+import com.QuestContest.controller.dto.PatchQuestRequest;
 import com.QuestContest.controller.dto.PatchUserRequest;
 import com.QuestContest.model.User;
-import com.QuestContest.service.User.UserService;
+import com.QuestContest.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,9 +41,9 @@ public class QuestContestController {
         return userService.add(user);
     }
 
-//    @PostMapping("{id}/datas")
-//    User addDataToUser(@PathVariable int id, @RequestBody PatchUserDataRequest patchUserDataRequest) {
-//        return imcService.addDataToUser(id, patchUserDataRequest);
-//    }
+    @PostMapping("{id}/quest")
+    User addQuest(@PathVariable Long id, @RequestBody PatchQuestRequest patchQuestRequest) {
+        return userService.addQuestfromUser(id, patchQuestRequest);
+    }
 
 }

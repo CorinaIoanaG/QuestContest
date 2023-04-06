@@ -1,4 +1,4 @@
-package com.QuestContest.service.User;
+package com.QuestContest.service;
 
 import com.QuestContest.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
