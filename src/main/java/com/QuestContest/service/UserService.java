@@ -1,10 +1,13 @@
 package com.QuestContest.service;
 
+import com.QuestContest.controller.RestExceptionHandler;
 import com.QuestContest.controller.dto.PatchQuestRequest;
 import com.QuestContest.exception.ResourceNotFoundException;
 import com.QuestContest.model.Quest;
 import com.QuestContest.model.User;
 import org.springframework.stereotype.Service;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.ErrorResponseException;
 
 import java.util.List;
 
@@ -55,10 +58,15 @@ public class UserService {
     // Adding a new Quest from a specific User.
     public User addQuestfromUser(Long id, PatchQuestRequest patchQuestRequest) {
         User user = getById(id);
-        Quest quest = new Quest(patchQuestRequest.badge(), patchQuestRequest.quest(), patchQuestRequest.answer());
-        quest.setUserQuest(user);
-        user.getQuests().add(quest);
-        return userRepository.save(user);
+        if (user.getTokens() > 100) {
+            Quest quest = new Quest(patchQuestRequest.badge(), patchQuestRequest.quest(), patchQuestRequest.answer());
+            quest.setUserQuest(user);
+            user.getQuests().add(quest);
+            return userRepository.save(user);
+        }
+        else {
+            throw new ResourceNotFoundException("Not enough tokens to ask quest", id);
+        }
     }
 
 }
