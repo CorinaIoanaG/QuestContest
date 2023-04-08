@@ -3,10 +3,7 @@ package com.QuestContest.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
@@ -19,11 +16,9 @@ public class Quest {
     @GeneratedValue
     private Long id;
     @ManyToOne
-    @Nullable
     @JsonIgnore
     private User userQuest;
     @ManyToOne
-    @Nullable
     @JsonIgnore
     private User userQuestAnswered;
     @Column

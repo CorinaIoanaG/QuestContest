@@ -1,6 +1,6 @@
 package com.QuestContest.controller;
 
-import com.QuestContest.controller.dto.PatchQuestRequest;
+import com.QuestContest.controller.dto.PostQuestRequest;
 import com.QuestContest.controller.dto.PatchUserRequest;
 import com.QuestContest.model.User;
 import com.QuestContest.service.UserService;
@@ -17,9 +17,14 @@ public class QuestContestController {
     private final UserService userService;
 
     @GetMapping
-    public List<User> getAll() {
-            return userService.getAll();
-        }
+    public List<User> getUsers() {
+        return userService.getAll();
+    }
+
+    @GetMapping(path= "/log")
+    public User getByNameAndPass(@RequestParam String name, @RequestParam String pass){
+        return userService.getByNameAndPass(name, pass);
+    }
 
     @GetMapping("{id}")
     public User getById(@PathVariable Long id) {
@@ -42,8 +47,8 @@ public class QuestContestController {
     }
 
     @PostMapping("{id}/quest")
-    User addQuest(@PathVariable Long id, @RequestBody PatchQuestRequest patchQuestRequest) {
-        return userService.addQuestfromUser(id, patchQuestRequest);
+    User addQuest(@PathVariable Long id, @RequestBody PostQuestRequest postQuestRequest) {
+        return userService.addQuestfromUser(id, postQuestRequest);
     }
 
 }
