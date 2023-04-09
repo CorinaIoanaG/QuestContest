@@ -1,7 +1,6 @@
-package com.QuestContest.model;
+package com.questcontest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,14 +23,17 @@ public class Quest {
     @Column
     private int badge;
     @Column
-    private String quest;
+    private String questDescription;
     @Column
     private String answer;
+    @Column
+    private boolean available;
 
-    public Quest(int badge, String quest, String answer) {
+    public Quest(int badge, String questDescription, String answer) {
         this.badge = badge;
-        this.quest = quest;
+        this.questDescription = questDescription;
         this.answer = answer;
+        this.available = true;
     }
 }
 

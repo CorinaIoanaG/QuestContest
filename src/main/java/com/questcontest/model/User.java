@@ -1,4 +1,4 @@
-package com.QuestContest.model;
+package com.questcontest.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -32,7 +32,7 @@ public class User {
     @Column
     private int tokens;
     @Column
-    private int ranking;
+    private Long ranking;
     @OneToMany(mappedBy = "userQuest", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     private List<Quest> quests;
     @OneToMany(mappedBy = "userQuestAnswered", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)

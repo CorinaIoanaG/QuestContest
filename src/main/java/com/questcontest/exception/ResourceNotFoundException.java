@@ -1,4 +1,4 @@
-package com.QuestContest.exception;
+package com.questcontest.exception;
 
 import lombok.Getter;
 

@@ -1,9 +1,10 @@
-package com.QuestContest.service;
+package com.questcontest.service.user;
 
-import com.QuestContest.exception.ResourceNotFoundException;
-import com.QuestContest.model.User;
+import com.questcontest.exception.ResourceNotFoundException;
+import com.questcontest.model.User;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,14 +27,27 @@ public class UserService {
     // Returns User with given name and password.
     public User getByNameAndPass(String name, String pass) {
         return userRepository.findAll().stream().filter(user ->
-                        Objects.equals(user.getName(), name) && Objects.equals(user.getPass(), pass))
-                .findFirst().get();
+                        Objects.equals(user.getName(), name) &&
+                                Objects.equals(user.getPass(), pass)).findFirst().get();
     }
 
     // Returns a User with a specific id.
     public User getById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User missing ", id));
+    }
+
+    // Updates all rankings.
+    public List<User> updateAllRankings(){
+         List<User> result = getAll().stream()
+                 .sorted(Comparator.comparingInt(User::getTokens).reversed())
+                 .toList();
+         Long i = Long.valueOf(1);
+         for (User user: result){
+            user.setRanking(i++);
+            userRepository.save(user);
+         }
+         return result ;
     }
 
     // Updates a specific User.

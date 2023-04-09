@@ -1,4 +1,4 @@
-package com.QuestContest;
+package com.questcontest;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
