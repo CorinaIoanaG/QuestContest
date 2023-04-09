@@ -3,6 +3,7 @@ package com.QuestContest.controller;
 import com.QuestContest.controller.dto.PostQuestRequest;
 import com.QuestContest.controller.dto.PatchUserRequest;
 import com.QuestContest.model.User;
+import com.QuestContest.service.QuestService;
 import com.QuestContest.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.List;
 
 public class QuestContestController {
     private final UserService userService;
+    private final QuestService questService;
 
     @GetMapping
     public List<User> getUsers() {
@@ -48,7 +50,7 @@ public class QuestContestController {
 
     @PostMapping("{id}/quest")
     User addQuest(@PathVariable Long id, @RequestBody PostQuestRequest postQuestRequest) {
-        return userService.addQuestfromUser(id, postQuestRequest);
+        return questService.addQuestfromUser(id, postQuestRequest);
     }
 
 }
