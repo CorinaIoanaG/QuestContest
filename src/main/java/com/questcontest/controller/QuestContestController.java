@@ -21,7 +21,7 @@ public class QuestContestController {
 
     @GetMapping
     public List<User> getUsers() {
-        return userService.getAll();
+        return userService.getAllUsers();
     }
 
     @GetMapping(path= "/log")
@@ -59,14 +59,14 @@ public class QuestContestController {
         return questService.addQuestfromUser(id, postQuestRequest);
     }
 
-    @GetMapping ("{id}/random-quest")
+    @GetMapping ("{id}/quest")
     Quest getRandomUnresolvedQuest(@PathVariable Long id){
-        return questService.getRandomUnresolvedQuestForUser((List<Quest>) getRandomUnresolvedQuest(id));
+        return questService.getAQuestForUser(id);
     }
 
-    @PostMapping("{id}/answer")
-    User resolveQuest(@PathVariable Long userId, @RequestParam Long questId, @RequestParam String answer) {
-        return questService.resolveQuestForUser(userId, questId, answer);
+    @PatchMapping("{id}/resolve")
+    User resolveQuest(@PathVariable Long id, @RequestParam Long questId, @RequestParam String answer) {
+        return questService.resolveQuestForUser(id, questId, answer);
     }
 
 

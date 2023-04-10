@@ -16,12 +16,12 @@ public class Quest {
     private Long id;
     @ManyToOne
     @JsonIgnore
-    private User userQuest;
+    private User userQuestProposed;
     @ManyToOne
     @JsonIgnore
     private User userQuestAnswered;
     @Column
-    private int badge;
+    private int tokens;
     @Column
     private String questDescription;
     @Column
@@ -29,8 +29,8 @@ public class Quest {
     @Column
     private boolean available;
 
-    public Quest(int badge, String questDescription, String answer) {
-        this.badge = badge;
+    public Quest(int tokens, String questDescription, String answer) {
+        this.tokens = tokens;
         this.questDescription = questDescription;
         this.answer = answer;
         this.available = true;

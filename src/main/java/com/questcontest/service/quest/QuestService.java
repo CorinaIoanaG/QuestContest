@@ -21,77 +21,90 @@ public class QuestService {
     private final UserService userService;
     private final QuestRepository questRepository;
 
+
+    // Returns all quests.
+    public List<Quest> getAllQuests() {
+        return questRepository.findAll();
+    }
+
     // Returns quest with a specific id.
     public Quest getById(Long id) {
         return questRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Quest missing ", id));
     }
+
     // Adds a new Quest from a specific User.
     public User addQuestfromUser(Long id, PostQuestRequest postQuestRequest) {
         User user = userService.getById(id);
-        if (user.getTokens() < 100) {
+        if (user.getTokens() < 10) {
             throw new ResourceNotFoundException("Not enough tokens to propose quest", id);
         }
-        if ((postQuestRequest.badge() < 1 && postQuestRequest.badge() <= user.getBadge())
-                || postQuestRequest.quest() == null || postQuestRequest.answer() == null) {
+        if ((postQuestRequest.tokens() < 1) || (postQuestRequest.tokens() > user.getLevel())
+                || (postQuestRequest.questDescription() == null) || (postQuestRequest.answer() == null)) {
             throw new RuntimeException("Quest has null fields or bad inputs");
         }
-        if (user.getQuests().stream().anyMatch(quest ->
-                quest.getQuestDescription().equalsIgnoreCase(postQuestRequest.quest()))) {
+        if (!questRepository.findByQuestDescription(postQuestRequest.questDescription()).isEmpty()) {
             throw new RuntimeException("Quest already exists");
         }
-        Quest quest = new Quest(postQuestRequest.badge(), postQuestRequest.quest(), postQuestRequest.answer());
-        quest.setUserQuest(user);
+        Quest quest = new Quest(postQuestRequest.tokens(), postQuestRequest.questDescription(), postQuestRequest.answer());
+        quest.setUserQuestProposed(user);
         user.getQuests().add(quest);
-        updateUserTokens(user, 5 * postQuestRequest.badge());
-        calculateUserBadge(user);
+        user.setTokens(userService.calculateUserTokens(user, 5 * postQuestRequest.tokens()));
+        user.setLevel(userService.calculateUserLevel(user));
         return userRepository.save(user);
     }
 
-    public void calculateUserBadge(User user) {
-        //noinspection IntegerDivisionInFloatingPointContext
-        user.setBadge((int) Math.ceil(user.getTokens() / 100));
-    }
-
-    public void updateUserTokens(User user, int amount) {
-        user.setTokens(user.getTokens() + amount);
-    }
-
-    // Returns unresolved quests for a specific User.
+    // Returns unresolved and available quests for a specific User.
     public List<Quest> getUnresolvedQuestsForUser(Long id) {
         User user = userService.getById(id);
-        return questRepository.findAll().stream()
-                .filter(quest -> !quest.getUserQuest().equals(user)
-                        && !quest.getUserQuestAnswered().equals(user))
+        return questRepository.findByAvailable(true).stream()
+                .filter(quest -> !(quest.getUserQuestProposed().equals(user))
+                        || !quest.getUserQuestAnswered().equals(user))
                 .toList();
     }
 
-    // Returns a random unresolved quest for a specific user.
-    public Quest getRandomUnresolvedQuestForUser(List<Quest> quests) {
+    //Returns a quest from List for a specific user id
+    public Quest getAQuestForUser(Long userId) {
         Random random = new Random();
-        Long questId = random.nextLong(quests.size());
-        return quests.get(Math.toIntExact(questId));
+        List<Quest> questsForUser = getUnresolvedQuestsForUser(userId);
+        int questId = random.nextInt(0,questsForUser.size()-1);
+        return questsForUser.get(questId);
     }
 
-
-    // Saves answer for a user quest, if is correct.
+    // Saves answer for a user quest, if it's correct.
     public User resolveQuestForUser(Long userId, Long questId, String answer) {
         User user = userService.getById(userId);
         Quest quest = getById(questId);
-        if (user.getTokens() < quest.getBadge()) {
-            throw new RuntimeException("Not enough badges for this quest");
+        User userProposedQuest = quest.getUserQuestProposed();
+        if (user.getTokens() < quest.getTokens()) {
+            throw new RuntimeException("Not enough tokens for this quest");
         }
-        if (quest.getAnswer().equalsIgnoreCase(answer)) {
-            updateUserTokens(user, quest.getBadge());
-            calculateUserBadge(user);
-            quest.setUserQuestAnswered(user);
-            updateUserTokens(quest.getUserQuest(), - quest.getBadge());
+        if (quest.getAnswer().equalsIgnoreCase(answer) || quest.getAnswer().contains(answer)) {
+            user.setTokens(userService.calculateUserTokens(user, quest.getTokens()));
+            user.getQuestsAnswered().add(quest);
+            userProposedQuest.setTokens(userService.calculateUserTokens(userProposedQuest, -quest.getTokens()));
         } else {
-            updateUserTokens(user, - quest.getBadge());
-            calculateUserBadge(user);
-            throw new RuntimeException("Wrong answer");
+            user.setTokens(userService.calculateUserTokens(user, -quest.getTokens()));
+            userProposedQuest.setTokens(userService.calculateUserTokens(userProposedQuest, quest.getTokens()));
         }
+        updateAvailabilityOfQuests(userProposedQuest, userProposedQuest.getTokens());
+        user.setLevel(userService.calculateUserLevel(userProposedQuest));
+        userRepository.save(userProposedQuest);
+        updateAvailabilityOfQuests(user, user.getTokens());
+        user.setLevel(userService.calculateUserLevel(user));
         return userRepository.save(user);
+    }
+
+    public void updateAvailabilityOfQuests(User user, int tokens) {
+        List<Quest> questsFromUser = questRepository.findByUserQuestProposed(user);
+        for (Quest quest : questsFromUser) {
+            if (quest.isAvailable() && quest.getTokens() > tokens) {
+                quest.setAvailable(false);
+            }
+            if (!quest.isAvailable() && quest.getTokens() < tokens) {
+                quest.setAvailable(true);
+            }
+        }
     }
 
 }

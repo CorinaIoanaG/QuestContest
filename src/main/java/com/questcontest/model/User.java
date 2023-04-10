@@ -28,14 +28,14 @@ public class User {
     @Column
     private String email;
     @Column
-    private int badge;
+    private int level;
     @Column
     private int tokens;
     @Column
     private Long ranking;
-    @OneToMany(mappedBy = "userQuest", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "userQuestProposed", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     private List<Quest> quests;
-    @OneToMany(mappedBy = "userQuestAnswered", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "userQuestAnswered", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     private List<Quest> questsAnswered;
 
 }
