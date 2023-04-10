@@ -28,7 +28,7 @@ public class User {
     @Column
     private String email;
     @Column
-    private int level;
+    private int badge;
     @Column
     private int tokens;
     @Column

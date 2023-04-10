@@ -39,7 +39,7 @@ public class QuestService {
         if (user.getTokens() < 10) {
             throw new ResourceNotFoundException("Not enough tokens to propose quest", id);
         }
-        if ((postQuestRequest.tokens() < 1) || (postQuestRequest.tokens() > user.getLevel())
+        if ((postQuestRequest.tokens() < 1) || (postQuestRequest.tokens() > user.getBadge())
                 || (postQuestRequest.questDescription() == null) || (postQuestRequest.answer() == null)) {
             throw new RuntimeException("Quest has null fields or bad inputs");
         }
@@ -50,7 +50,7 @@ public class QuestService {
         quest.setUserQuestProposed(user);
         user.getQuests().add(quest);
         user.setTokens(userService.calculateUserTokens(user, 5 * postQuestRequest.tokens()));
-        user.setLevel(userService.calculateUserLevel(user));
+        user.setBadge(userService.calculateUserBadge(user));
         return userRepository.save(user);
     }
 
@@ -67,7 +67,7 @@ public class QuestService {
     public Quest getAQuestForUser(Long userId) {
         Random random = new Random();
         List<Quest> questsForUser = getUnresolvedQuestsForUser(userId);
-        int questId = random.nextInt(0,questsForUser.size()-1);
+        int questId = random.nextInt(questsForUser.size());
         return questsForUser.get(questId);
     }
 
@@ -88,10 +88,10 @@ public class QuestService {
             userProposedQuest.setTokens(userService.calculateUserTokens(userProposedQuest, quest.getTokens()));
         }
         updateAvailabilityOfQuests(userProposedQuest, userProposedQuest.getTokens());
-        user.setLevel(userService.calculateUserLevel(userProposedQuest));
+        user.setBadge(userService.calculateUserBadge(userProposedQuest));
         userRepository.save(userProposedQuest);
         updateAvailabilityOfQuests(user, user.getTokens());
-        user.setLevel(userService.calculateUserLevel(user));
+        user.setBadge(userService.calculateUserBadge(user));
         return userRepository.save(user);
     }
 

@@ -73,7 +73,7 @@ public class UserService {
         if (!userRepository.findByName(user.getName()).isEmpty()) {
             throw new RuntimeException("User Name already exists");
         }
-        user.setLevel(1);
+        user.setBadge(1);
         user.setTokens(20);
         return userRepository.save(user);
     }
@@ -82,7 +82,7 @@ public class UserService {
         return user.getTokens() + amount;
     }
 
-    public int calculateUserLevel(User user) {
+    public int calculateUserBadge(User user) {
         return (int) user.getTokens() / 100 + 1;
     }
 }
