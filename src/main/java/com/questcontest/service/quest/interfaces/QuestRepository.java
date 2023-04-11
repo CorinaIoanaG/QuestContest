@@ -1,4 +1,4 @@
-package com.questcontest.service.quest;
+package com.questcontest.service.quest.interfaces;
 
 import com.questcontest.model.Quest;
 import com.questcontest.model.User;

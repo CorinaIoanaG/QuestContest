@@ -1,7 +1,8 @@
-package com.questcontest.service.user;
+package com.questcontest.service.user.classes;
 
 import com.questcontest.model.Quest;
 import com.questcontest.model.User;
+import com.questcontest.service.user.interfaces.UserReaderInterface;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Repository
 
-public class UserReader {
+public class UserReader implements UserReaderInterface {
 
     // Reads users from file and returns a list with users.
     public List<User> getUsers() {
@@ -33,16 +34,17 @@ public class UserReader {
     }
 
     // Splits a line read from file in User parts and returns users, one by one.
-    private User lineToUser(String line) throws ParseException {
+    public User lineToUser(String line) throws ParseException {
         String[] userParts = line.split("\\|");
         User user = new User(0L, userParts[0], userParts[1], userParts[2], userParts[3], Integer.parseInt(userParts[4]),
                 Integer.parseInt(userParts[5]), Long.parseLong(userParts[6]),
-                userParts.length > 7 ? List.of(parseQuest(userParts[7])):List.of(),List.of());
+                userParts.length > 7 ? List.of(parseQuest(userParts[7])):List.of());
         user.getQuestsProposed().forEach(quest -> quest.setUserQuestProposed(user));
         return user;
     }
 
-    private Quest parseQuest(String questItem){
+    // Splits a String in Quest parts.
+    public Quest parseQuest(String questItem){
         String[] questParts = questItem.split("\\^");
         return new Quest(Integer.parseInt(questParts[0]),questParts[1], questParts[2]);
     }

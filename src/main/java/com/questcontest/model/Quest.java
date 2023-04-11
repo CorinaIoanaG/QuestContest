@@ -17,9 +17,6 @@ public class Quest {
     @ManyToOne
     @JsonIgnore
     private User userQuestProposed;
-    @ManyToOne
-    @JsonIgnore
-    private User userQuestAnswered;
     @Column
     private int tokens;
     @Column

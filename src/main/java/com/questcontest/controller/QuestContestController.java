@@ -4,8 +4,8 @@ import com.questcontest.controller.dto.PostQuestRequest;
 import com.questcontest.controller.dto.PatchUserRequest;
 import com.questcontest.model.Quest;
 import com.questcontest.model.User;
-import com.questcontest.service.quest.QuestService;
-import com.questcontest.service.user.UserService;
+import com.questcontest.service.quest.classes.QuestService;
+import com.questcontest.service.user.classes.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,7 +56,7 @@ public class QuestContestController {
 
     @PostMapping("{id}/quest")
     User addQuest(@PathVariable Long id, @RequestBody PostQuestRequest postQuestRequest) {
-        return questService.addQuestfromUser(id, postQuestRequest);
+        return questService.addQuestFromUser(id, postQuestRequest);
     }
 
     @GetMapping ("{id}/quest")

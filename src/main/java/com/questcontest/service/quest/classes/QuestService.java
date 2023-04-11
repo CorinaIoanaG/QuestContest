@@ -1,11 +1,12 @@
-package com.questcontest.service.quest;
+package com.questcontest.service.quest.classes;
 
 import com.questcontest.controller.dto.PostQuestRequest;
-import com.questcontest.exception.ResourceNotFoundException;
 import com.questcontest.model.Quest;
 import com.questcontest.model.User;
-import com.questcontest.service.user.UserRepository;
-import com.questcontest.service.user.UserService;
+import com.questcontest.service.quest.interfaces.QuestRepository;
+import com.questcontest.service.quest.interfaces.QuestServiceInterface;
+import com.questcontest.service.user.interfaces.UserRepository;
+import com.questcontest.service.user.interfaces.UserServiceInterface;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,29 +16,24 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 
-public class QuestService {
+public class QuestService implements QuestServiceInterface {
 
     private final UserRepository userRepository;
-    private final UserService userService;
+    private final UserServiceInterface userService;
     private final QuestRepository questRepository;
 
 
-    // Returns all quests.
-    public List<Quest> getAllQuests() {
-        return questRepository.findAll();
-    }
-
-    // Returns quest with a specific id.
-    public Quest getById(Long id) {
-        return questRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Quest missing ", id));
+    // Returns quest with a specific questId.
+    public Quest getById(Long questId) {
+        return questRepository.findById(questId)
+                .orElseThrow(() -> new RuntimeException("Quest missing "));
     }
 
     // Adds a new Quest from a specific User.
-    public User addQuestfromUser(Long id, PostQuestRequest postQuestRequest) {
-        User user = userService.getById(id);
+    public User addQuestFromUser(Long userId, PostQuestRequest postQuestRequest) {
+        User user = userService.getById(userId);
         if (user.getTokens() < 10) {
-            throw new ResourceNotFoundException("Not enough tokens to propose quest", id);
+            throw new RuntimeException("Not enough tokens to propose quest");
         }
         if ((postQuestRequest.tokens() < 1) || (postQuestRequest.tokens() > user.getBadge())
                 || (postQuestRequest.questDescription() == null) || (postQuestRequest.answer() == null)) {
@@ -55,18 +51,16 @@ public class QuestService {
     }
 
     // Returns unresolved and available quests for a specific User.
-    public List<Quest> getUnresolvedQuestsForUser(Long id) {
-        User user = userService.getById(id);
+    public List<Quest> getQuestsForUser(Long userId) {
+        User user = userService.getById(userId);
         return questRepository.findByAvailable(true).stream()
-                .filter(quest -> (quest.getTokens() <= user.getTokens() || (quest.getUserQuestProposed()!= null
-                        || !(quest.getUserQuestProposed().equals(user))) || (quest.getUserQuestAnswered()!= null
-                        || !quest.getUserQuestAnswered().equals(user))))
+                .filter(quest -> quest.getTokens() <= user.getTokens())
                 .toList();
     }
 
     //Returns a quest from List for a specific user id
     public Quest getAQuestForUser(Long userId) {
-        List<Quest> questsForUser = getUnresolvedQuestsForUser(userId);
+        List<Quest> questsForUser = getQuestsForUser(userId);
         if (questsForUser.size() < 1) {
             throw new RuntimeException("No questions for this user");
         }
@@ -82,11 +76,12 @@ public class QuestService {
         User userProposedQuest = quest.getUserQuestProposed();
         if (quest.getAnswer().equalsIgnoreCase(answer) || quest.getAnswer().contains(answer)) {
             user.setTokens(userService.calculateUserTokens(user, quest.getTokens()));
-            user.getQuestsAnswered().add(quest);
             userProposedQuest.setTokens(userService.calculateUserTokens(userProposedQuest, -quest.getTokens()));
         } else {
             user.setTokens(userService.calculateUserTokens(user, -quest.getTokens()));
+            userRepository.save(user);
             userProposedQuest.setTokens(userService.calculateUserTokens(userProposedQuest, quest.getTokens()));
+            userRepository.save(userProposedQuest);
             throw new RuntimeException("Wrong answer");
         }
         updateAvailabilityOfQuests(userProposedQuest, userProposedQuest.getTokens());

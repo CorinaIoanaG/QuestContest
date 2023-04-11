@@ -1,7 +1,9 @@
-package com.questcontest.service.user;
+package com.questcontest.service.user.classes;
 
-import com.questcontest.exception.ResourceNotFoundException;
 import com.questcontest.model.User;
+import com.questcontest.service.user.interfaces.UserReaderInterface;
+import com.questcontest.service.user.interfaces.UserRepository;
+import com.questcontest.service.user.interfaces.UserServiceInterface;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -9,11 +11,11 @@ import java.util.List;
 
 @Service
 
-public class UserService {
+public class UserService implements UserServiceInterface {
     private final UserRepository userRepository;
 
     // Constructor
-    public UserService(UserRepository userRepository, UserReader userReader) {
+    public UserService(UserRepository userRepository, UserReaderInterface userReader) {
         this.userRepository = userRepository;
         userRepository.saveAll(userReader.getUsers());
     }
@@ -29,9 +31,9 @@ public class UserService {
     }
 
     // Returns a User with a specific id.
-    public User getById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User missing ", id));
+    public User getById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User missing "));
     }
 
     // Updates rankings for all users and returns users.
@@ -48,11 +50,11 @@ public class UserService {
     }
 
     // Updates a specific User.
-    public User patch(Long id, String name, String pass, String fullName, String email) {
+    public User patch(Long userId, String name, String pass, String fullName, String email) {
         if (name.isBlank() || pass.isBlank() || fullName.isBlank() || email.isBlank()) {
             throw new RuntimeException("User has null fields");
         }
-        User userToBeUpdated = getById(id);
+        User userToBeUpdated = getById(userId);
         userToBeUpdated.setName(name);
         userToBeUpdated.setPass(pass);
         userToBeUpdated.setFullName(fullName);
@@ -62,9 +64,9 @@ public class UserService {
 
 
     // Deletes a specific User.
-    public User deleteById(Long id) {
-        User userToBeDeleted = getById(id);
-        userRepository.deleteById(id);
+    public User deleteById(Long userId) {
+        User userToBeDeleted = getById(userId);
+        userRepository.deleteById(userId);
         return userToBeDeleted;
     }
 
