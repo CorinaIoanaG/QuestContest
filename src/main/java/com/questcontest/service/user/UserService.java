@@ -39,7 +39,7 @@ public class UserService {
         List<User> result = getAllUsers().stream()
                 .sorted(Comparator.comparingInt(User::getTokens).reversed())
                 .toList();
-        Long i = Long.valueOf(1);
+        Long i = 1L;
         for (User user : result) {
             user.setRanking(i++);
             userRepository.save(user);
@@ -49,6 +49,9 @@ public class UserService {
 
     // Updates a specific User.
     public User patch(Long id, String name, String pass, String fullName, String email) {
+        if (name.isBlank() || pass.isBlank() || fullName.isBlank() || email.isBlank()) {
+            throw new RuntimeException("User has null fields");
+        }
         User userToBeUpdated = getById(id);
         userToBeUpdated.setName(name);
         userToBeUpdated.setPass(pass);
@@ -56,6 +59,7 @@ public class UserService {
         userToBeUpdated.setEmail(email);
         return userRepository.save(userToBeUpdated);
     }
+
 
     // Deletes a specific User.
     public User deleteById(Long id) {
@@ -83,6 +87,6 @@ public class UserService {
     }
 
     public int calculateUserBadge(User user) {
-        return (int) user.getTokens() / 100 + 1;
+        return user.getTokens() / 100 + 1;
     }
 }

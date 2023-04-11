@@ -34,7 +34,7 @@ public class User {
     @Column
     private Long ranking;
     @OneToMany(mappedBy = "userQuestProposed", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
-    private List<Quest> quests;
+    private List<Quest> questsProposed;
     @OneToMany(mappedBy = "userQuestAnswered", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     private List<Quest> questsAnswered;
 

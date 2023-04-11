@@ -1,5 +1,6 @@
 package com.questcontest.service.user;
 
+import com.questcontest.model.Quest;
 import com.questcontest.model.User;
 import org.springframework.stereotype.Repository;
 
@@ -35,9 +36,15 @@ public class UserReader {
     private User lineToUser(String line) throws ParseException {
         String[] userParts = line.split("\\|");
         User user = new User(0L, userParts[0], userParts[1], userParts[2], userParts[3], Integer.parseInt(userParts[4]),
-                Integer.parseInt(userParts[5]), Long.parseLong(userParts[6]), List.of(),List.of());
+                Integer.parseInt(userParts[5]), Long.parseLong(userParts[6]),
+                userParts.length > 7 ? List.of(parseQuest(userParts[7])):List.of(),List.of());
+        user.getQuestsProposed().forEach(quest -> quest.setUserQuestProposed(user));
         return user;
     }
 
+    private Quest parseQuest(String questItem){
+        String[] questParts = questItem.split("\\^");
+        return new Quest(Integer.parseInt(questParts[0]),questParts[1], questParts[2]);
+    }
 
 }

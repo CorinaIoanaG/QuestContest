@@ -1,3 +1,3 @@
-nadiag|123|Nadia Ghete|ng@yahoo.com|2|200|1
-dariusf|456|Darius Farcas|d@yahoo.com|2|90|2
-florinah|789|Florina Hotca|f@yahoo.com|1|10|3
+nadiag|123|Nadia Ghete|ng@yahoo.com|3|200|1|2^Care este cel mai lung rau din lume?^Amazon
+dariusf|456|Darius Farcas|d@yahoo.com|2|90|2|1^Pe ce continet se afla Egiptul?^Africa
+florinah|789|Florina Hotca|f@yahoo.com|1|10|3|1^Ce tara are forma unei cizme?^Italia

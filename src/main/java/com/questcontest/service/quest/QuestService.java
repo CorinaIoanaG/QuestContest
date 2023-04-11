@@ -48,7 +48,7 @@ public class QuestService {
         }
         Quest quest = new Quest(postQuestRequest.tokens(), postQuestRequest.questDescription(), postQuestRequest.answer());
         quest.setUserQuestProposed(user);
-        user.getQuests().add(quest);
+        user.getQuestsProposed().add(quest);
         user.setTokens(userService.calculateUserTokens(user, 5 * postQuestRequest.tokens()));
         user.setBadge(userService.calculateUserBadge(user));
         return userRepository.save(user);
@@ -58,15 +58,19 @@ public class QuestService {
     public List<Quest> getUnresolvedQuestsForUser(Long id) {
         User user = userService.getById(id);
         return questRepository.findByAvailable(true).stream()
-                .filter(quest -> !(quest.getUserQuestProposed().equals(user))
-                        || !quest.getUserQuestAnswered().equals(user))
+                .filter(quest -> (quest.getTokens() <= user.getTokens() || (quest.getUserQuestProposed()!= null
+                        || !(quest.getUserQuestProposed().equals(user))) || (quest.getUserQuestAnswered()!= null
+                        || !quest.getUserQuestAnswered().equals(user))))
                 .toList();
     }
 
     //Returns a quest from List for a specific user id
     public Quest getAQuestForUser(Long userId) {
-        Random random = new Random();
         List<Quest> questsForUser = getUnresolvedQuestsForUser(userId);
+        if (questsForUser.size() < 1) {
+            throw new RuntimeException("No questions for this user");
+        }
+        Random random = new Random();
         int questId = random.nextInt(questsForUser.size());
         return questsForUser.get(questId);
     }
@@ -76,9 +80,6 @@ public class QuestService {
         User user = userService.getById(userId);
         Quest quest = getById(questId);
         User userProposedQuest = quest.getUserQuestProposed();
-        if (user.getTokens() < quest.getTokens()) {
-            throw new RuntimeException("Not enough tokens for this quest");
-        }
         if (quest.getAnswer().equalsIgnoreCase(answer) || quest.getAnswer().contains(answer)) {
             user.setTokens(userService.calculateUserTokens(user, quest.getTokens()));
             user.getQuestsAnswered().add(quest);
@@ -86,6 +87,7 @@ public class QuestService {
         } else {
             user.setTokens(userService.calculateUserTokens(user, -quest.getTokens()));
             userProposedQuest.setTokens(userService.calculateUserTokens(userProposedQuest, quest.getTokens()));
+            throw new RuntimeException("Wrong answer");
         }
         updateAvailabilityOfQuests(userProposedQuest, userProposedQuest.getTokens());
         user.setBadge(userService.calculateUserBadge(userProposedQuest));
