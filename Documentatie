@@ -1,0 +1,66 @@
+
+APLICATIA QUEST CONTEST
+NUME SI PRENUME PROGRAMATOR: GHEȚE CORINA IOANA
+
+
+DESCRIEREA APLICATIEI
+
+Aplicatia consta intr-un concurs de raspuns la intrebari. 
+
+Sistemul de recompense utilizat este reprezentat de badge (nivelul la care a ajuns userul), tokens (puncte),  si ranking (loc in clasament), campuri cu valoare int, astfel:
+
+•	Badge are valoarea minima 1si se stabileste astfel :
+o	1 – la crearea unui user nou, 
+o	Valoarea int a expresiei tokens/100 + 1.
+
+•	Quest tokens reprezinta punctele aferente intrebarii (de la 1 la badge-ul la care a ajuns userul care propune intrebarea). Pentru a propune o intrebare, un user trebuie sa aiba minim 10 tokens. 
+
+•	User tokens se primesc, astfel:
+o	20 – la crearea unui user nou,
+o	5 * Quest tokens la adaugarea unei intrebari noi,
+o	Quest tokens la raspuns corect la intrebare,
+o	Quest tokens la raspuns gresit al unui alt user la intrebarea propusa de user.
+
+•	User tokens se pierd, astfel:
+o	Quest tokens la raspuns gresit la intrebare,
+o	Quest tokens la raspuns corect al unui alt user la intrebarea propusa de user.
+Daca Quest tokens >=User tokens, pentru fiecare intrebare propusa de user, atunci intrebarea nu va mai fi disponibila.
+
+•	Ranking este stabilit in functie de numarul de tokens – descrescator, pentru fiecare user, in parte.
+
+ 
+BACK-END
+
+Partea de back-end a fost scrisa in limbajul de programare Java, prin crearea unei aplicatii Spring – Proiect Maven, la care s-au adaugat dependinte (H2 database, Spring Web, Spring Data JPA, Lombok, Spring Rest, Spring Boot Test) pentru a folosi programarea functionala  si dezvoltarea ei ulterioara in aplicatia Intellij. S-a respectat structura de directoare creata de  aplicatia Spring.
+
+Initial, se porneste aplicatia cu cativa userii preinregistrati, cititi dintr-un fisier text(src/main/resources/usersdata.txt) si incarcati intr-o baza de date H2, impreuna cu datele lor si cateva intrebari propuse de acestia, pentru a avea cateva date de pornire. 
+
+In package controller se gasesc clasa QuestContestController pentru a afisa si manipula datele pe Front-end, 2 clase de tip record pentru a primi RequestBody de la Front-end.
+
+In package model avem 2 clase (User si Quest), care sunt entitati si genereaza 2 tabele relationale, avand o relatie OneToMany (questsProposed-> creatorUser) pentru a manipula datele:
+•	User, cu urmatoarele field -uri: id, name, pass, fullName, email, badge, tokens, ranking, questsProposed.
+•	Quest, cu urmatoarele field-uri: id, creatorUser, tokens, questDescription, answer, available.
+
+In package service.classes se gasesc clasele :
+•	UserReader pentru a citi datele din fisier text.
+•	UserService/QuestService care ofera toata partea de service pentru entitatile User si Quest.
+
+In package service.interfaces se gasesc interfete care sunt implementate sau instantiate de clasele din service.classes:
+•	UserRepository/QuestRepository, o interfata care extinde JpaRepository, pentru a avea acces la operatiile CRUD si cautare in baza de date.
+•	UserServiceInterface/QuestServiceInterface care defineste metodele ce trebuie implementate in clasa UserService/QuestService
+
+ 
+FRONT-END
+
+Partea de front-end a fost scrisa in limbajele de programare TypeScript, HTML si CSS, prin crearea unei aplicatii React, cu ajutorul librariei Axios, Mui, folosind aplicatia Visual Studio Code. 
+
+In prima pagina web a aplicatiei avem urmatoarele functionalitati :
+•	In casuta “SING IN” se pot loga userii, prin introducerea User Name si a User Password (De exemplu : “User Name : nadiag, User Password: 123” sau “User Name : florinah, User Password: 789”). Apoi, prin click pe “OK” se logheaza userul daca datele introduce au fost corecte.
+•	In casuta “ADD NEW USER” se poate crea un user nou, introducand date in campurile prezente: User Name, User Passwor, Full Name si Email. Apoi, prin “SAVE” se salveaza userul, daca nu exista in baza de date un alt user cu acelasi User Name si daca toate campurile sunt completate.
+•	In casuta “CURRENT RANKINGS”, prin click pe acest camp se afiseaza topul actualizat al userilor aplicatiei, sortati in functie de numarul de tokens.
+
+In a doua pagina web a aplicatiei, la care avem acces dupa logarea unui user:
+•	In prima casuta de sus, se afiseaza informatiile userului, care se vor actualiza in functie de datele introduce in celelalte casute. De asemenea, aici avem butoanele de “LOG OUT” care delogheaza userul si “DELETE USER” care sterge userul curent, incarcand apoi prima web pagina a aplicatiei.
+•	In casuta ”ADD QUEST”, userul poate propune intrebari, daca are un numar minim de 10 tokens, introducand date in campurile prezente: Tokens (valoarea maxima e badge-ul la care este userul), Quest Description si Answer. Apoi, prin “SAVE” se salveaza intrebarea, daca aceasta nu exista deja in baza de date si toate campurile sunt completate corect. Userul primeste tokens, in valoare de 5 ori mai mare decat tokens-urile intrebarii salvate.
+•	In casuta “SOLVE QUEST”, prin click pe acest buton se afiseaza o intrebare random, care este available. Userul va introduce raspunsul in campul Answer. Daca va raspunde corect atunci va primi valoarea tokens-urilor intrebarii, care se vor scadea de la userul care a propus intrebarea. Daca raspunsul e gresit, atunci i se va scadea valoarea tokens-urilor intrebarii si se vor adauga la userul care a propus intrebarea.
+•	In casuta “MODIFY USER” se pot modifica campurile : User Name, Password, Full Name si Email, ale userului curent.  Prin “SAVE” se salveaza datele in baza de date, daca toate campurile sunt completate.
