@@ -76,7 +76,6 @@ public class QuestService implements QuestServiceInterface {
         User creatorUser = quest.getCreatorUser();
         if (quest.getAnswer().equalsIgnoreCase(answer) || quest.getAnswer().contains(answer)) {
             user.setTokens(userService.calculateUserTokens(user, quest.getTokens()));
-            updateAvailabilityOfQuests(user);
             creatorUser.setTokens(userService.calculateUserTokens(creatorUser, -quest.getTokens()));
             updateAvailabilityOfQuests(creatorUser);
         } else {
@@ -84,7 +83,6 @@ public class QuestService implements QuestServiceInterface {
             updateAvailabilityOfQuests(user);
             userRepository.save(user);
             creatorUser.setTokens(userService.calculateUserTokens(creatorUser, quest.getTokens()));
-            updateAvailabilityOfQuests(creatorUser);
             userRepository.save(creatorUser);
             throw new RuntimeException("Wrong answer");
         }
@@ -99,9 +97,6 @@ public class QuestService implements QuestServiceInterface {
         for (Quest quest : questsFromUser) {
             if (quest.isAvailable() && quest.getTokens() >= user.getTokens()) {
                 quest.setAvailable(false);
-            }
-            if (!quest.isAvailable() && quest.getTokens() < user.getTokens()) {
-                quest.setAvailable(true);
             }
         }
     }
