@@ -1,4 +1,4 @@
-package com.questcontest.service.quest.interfaces;
+package com.questcontest.service.interfaces;
 
 import com.questcontest.controller.dto.PostQuestRequest;
 import com.questcontest.model.Quest;
@@ -18,5 +18,5 @@ public interface QuestServiceInterface {
 
      User resolveQuestForUser(Long userId, Long questId, String answer);
 
-     void updateAvailabilityOfQuests(User user, int tokens);
+     void updateAvailabilityOfQuests(User user) throws RuntimeException;
 }

@@ -1,8 +1,8 @@
-package com.questcontest.service.user.classes;
+package com.questcontest.service.classes;
 
 import com.questcontest.model.Quest;
 import com.questcontest.model.User;
-import com.questcontest.service.user.interfaces.UserReaderInterface;
+import com.questcontest.service.interfaces.UserReaderInterface;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -39,7 +39,7 @@ public class UserReader implements UserReaderInterface {
         User user = new User(0L, userParts[0], userParts[1], userParts[2], userParts[3], Integer.parseInt(userParts[4]),
                 Integer.parseInt(userParts[5]), Long.parseLong(userParts[6]),
                 userParts.length > 7 ? List.of(parseQuest(userParts[7])):List.of());
-        user.getQuestsProposed().forEach(quest -> quest.setUserQuestProposed(user));
+        user.getQuestsProposed().forEach(quest -> quest.setCreatorUser(user));
         return user;
     }
 

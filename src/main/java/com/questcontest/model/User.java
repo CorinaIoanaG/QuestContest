@@ -33,7 +33,7 @@ public class User {
     private int tokens;
     @Column
     private Long ranking;
-    @OneToMany(mappedBy = "userQuestProposed", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "creatorUser", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     private List<Quest> questsProposed;
 
 }

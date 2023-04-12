@@ -16,7 +16,7 @@ public class Quest {
     private Long id;
     @ManyToOne
     @JsonIgnore
-    private User userQuestProposed;
+    private User creatorUser;
     @Column
     private int tokens;
     @Column

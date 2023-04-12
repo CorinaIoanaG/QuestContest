@@ -1,9 +1,9 @@
-package com.questcontest.service.user.classes;
+package com.questcontest.service.classes;
 
 import com.questcontest.model.User;
-import com.questcontest.service.user.interfaces.UserReaderInterface;
-import com.questcontest.service.user.interfaces.UserRepository;
-import com.questcontest.service.user.interfaces.UserServiceInterface;
+import com.questcontest.service.interfaces.UserReaderInterface;
+import com.questcontest.service.interfaces.UserRepository;
+import com.questcontest.service.interfaces.UserServiceInterface;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;

@@ -1,4 +1,4 @@
-package com.questcontest.service.quest.interfaces;
+package com.questcontest.service.interfaces;
 
 import com.questcontest.model.Quest;
 import com.questcontest.model.User;
@@ -12,7 +12,7 @@ public interface QuestRepository extends JpaRepository<Quest, Long> {
 
     List<Quest> findByQuestDescription(String questDescription);
 
-    List<Quest> findByUserQuestProposed(User userQuestProposed);
+    List<Quest> findByCreatorUser(User creatorUser);
 
     List<Quest> findByAvailable(boolean available);
 

@@ -4,8 +4,8 @@ import com.questcontest.controller.dto.PostQuestRequest;
 import com.questcontest.controller.dto.PatchUserRequest;
 import com.questcontest.model.Quest;
 import com.questcontest.model.User;
-import com.questcontest.service.quest.classes.QuestService;
-import com.questcontest.service.user.classes.UserService;
+import com.questcontest.service.classes.QuestService;
+import com.questcontest.service.classes.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

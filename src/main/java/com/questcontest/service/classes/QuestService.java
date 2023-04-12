@@ -1,12 +1,12 @@
-package com.questcontest.service.quest.classes;
+package com.questcontest.service.classes;
 
 import com.questcontest.controller.dto.PostQuestRequest;
 import com.questcontest.model.Quest;
 import com.questcontest.model.User;
-import com.questcontest.service.quest.interfaces.QuestRepository;
-import com.questcontest.service.quest.interfaces.QuestServiceInterface;
-import com.questcontest.service.user.interfaces.UserRepository;
-import com.questcontest.service.user.interfaces.UserServiceInterface;
+import com.questcontest.service.interfaces.QuestRepository;
+import com.questcontest.service.interfaces.QuestServiceInterface;
+import com.questcontest.service.interfaces.UserRepository;
+import com.questcontest.service.interfaces.UserServiceInterface;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +43,7 @@ public class QuestService implements QuestServiceInterface {
             throw new RuntimeException("Quest already exists");
         }
         Quest quest = new Quest(postQuestRequest.tokens(), postQuestRequest.questDescription(), postQuestRequest.answer());
-        quest.setUserQuestProposed(user);
+        quest.setCreatorUser(user);
         user.getQuestsProposed().add(quest);
         user.setTokens(userService.calculateUserTokens(user, 5 * postQuestRequest.tokens()));
         user.setBadge(userService.calculateUserBadge(user));
@@ -73,32 +73,34 @@ public class QuestService implements QuestServiceInterface {
     public User resolveQuestForUser(Long userId, Long questId, String answer) {
         User user = userService.getById(userId);
         Quest quest = getById(questId);
-        User userProposedQuest = quest.getUserQuestProposed();
+        User creatorUser = quest.getCreatorUser();
         if (quest.getAnswer().equalsIgnoreCase(answer) || quest.getAnswer().contains(answer)) {
             user.setTokens(userService.calculateUserTokens(user, quest.getTokens()));
-            userProposedQuest.setTokens(userService.calculateUserTokens(userProposedQuest, -quest.getTokens()));
+            updateAvailabilityOfQuests(user);
+            creatorUser.setTokens(userService.calculateUserTokens(creatorUser, -quest.getTokens()));
+            updateAvailabilityOfQuests(creatorUser);
         } else {
             user.setTokens(userService.calculateUserTokens(user, -quest.getTokens()));
+            updateAvailabilityOfQuests(user);
             userRepository.save(user);
-            userProposedQuest.setTokens(userService.calculateUserTokens(userProposedQuest, quest.getTokens()));
-            userRepository.save(userProposedQuest);
+            creatorUser.setTokens(userService.calculateUserTokens(creatorUser, quest.getTokens()));
+            updateAvailabilityOfQuests(creatorUser);
+            userRepository.save(creatorUser);
             throw new RuntimeException("Wrong answer");
         }
-        updateAvailabilityOfQuests(userProposedQuest, userProposedQuest.getTokens());
-        user.setBadge(userService.calculateUserBadge(userProposedQuest));
-        userRepository.save(userProposedQuest);
-        updateAvailabilityOfQuests(user, user.getTokens());
+        user.setBadge(userService.calculateUserBadge(creatorUser));
+        userRepository.save(creatorUser);
         user.setBadge(userService.calculateUserBadge(user));
         return userRepository.save(user);
     }
 
-    public void updateAvailabilityOfQuests(User user, int tokens) {
-        List<Quest> questsFromUser = questRepository.findByUserQuestProposed(user);
+    public void updateAvailabilityOfQuests(User user) {
+        List<Quest> questsFromUser = questRepository.findByCreatorUser(user);
         for (Quest quest : questsFromUser) {
-            if (quest.isAvailable() && quest.getTokens() > tokens) {
+            if (quest.isAvailable() && quest.getTokens() >= user.getTokens()) {
                 quest.setAvailable(false);
             }
-            if (!quest.isAvailable() && quest.getTokens() < tokens) {
+            if (!quest.isAvailable() && quest.getTokens() < user.getTokens()) {
                 quest.setAvailable(true);
             }
         }
